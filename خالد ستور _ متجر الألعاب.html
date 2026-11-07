@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>خالد ستور | متجر الألعاب</title>
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: #070b10; --text: #f4f6f8; --muted: #aab4bf;
+    --accent: #ff9f1c; --accent2: #7bd389;
+    --glass: rgba(255,255,255,.08); --glass-line: rgba(255,255,255,.18);
+    /* ضع صورة ببجي الخاصة بك هنا، مثال: url('pubg.jpg') */
+    --hero-image: none;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: system-ui, "Segoe UI", Tahoma, sans-serif; min-height: 100%; }
+
+  /* الخلفية */
+  .bg { position: fixed; inset: 0; z-index: 0; overflow: hidden;
+        background: linear-gradient(180deg, #0b1a2b 0%, #3a2a3f 55%, #b5532a 100%); }
+  .bg-image { position: absolute; inset: 0; background-image: var(--hero-image); background-size: cover; background-position: center; opacity: .55; }
+  .bg::after { content: ""; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 30%, transparent 30%, rgba(0,0,0,.6) 100%); }
+  canvas { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
+  .chute { position: absolute; width: 120px; top: -160px; animation: drop 18s linear infinite, sway 4s ease-in-out infinite; opacity: .9; }
+  .chute.c2 { width: 80px; animation-duration: 26s, 5s; animation-delay: -9s, -2s; left: 70%; }
+  .chute.c3 { width: 60px; animation-duration: 32s, 6s; animation-delay: -18s, -1s; left: 20%; opacity: .6; }
+  @keyframes drop { to { top: 105%; } }
+  @keyframes sway { 0%,100% { transform: translateX(-24px) rotate(-6deg); } 50% { transform: translateX(24px) rotate(6deg); } }
+
+  /* المحتوى */
+  .page { position: relative; z-index: 2; padding-bottom: env(safe-area-inset-bottom, 0px); }
+  header { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; justify-content: space-between;
+           padding: calc(12px + env(safe-area-inset-top, 0px)) 20px 12px; background: rgba(7,11,16,.45);
+           backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--glass-line); }
+  .logo { font-weight: 800; font-size: 1.3rem; letter-spacing: .5px; }
+  .logo span { color: var(--accent); text-shadow: 0 0 14px var(--accent); }
+  .cart-btn { background: var(--accent); color: #1a1100; border: 0; border-radius: 999px; padding: 8px 16px; font-weight: 700; font-size: .95rem; cursor: pointer; }
+  .cart-btn.bump { animation: bump .35s; }
+  @keyframes bump { 50% { transform: scale(1.18); } }
+
+  .hero { min-height: 70vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px 20px; }
+  .hero h1 { font-size: clamp(2.4rem, 9vw, 4.6rem); margin: 0; line-height: 1.15;
+             background: linear-gradient(90deg, #fff, var(--accent), #fff); background-size: 200% auto;
+             -webkit-background-clip: text; background-clip: text; color: transparent; animation: shine 5s linear infinite; }
+  @keyframes shine { to { background-position: 200% center; } }
+  .hero p { color: var(--muted); font-size: 1.1rem; max-width: 480px; margin: 14px 0 26px; }
+  .cta { display: inline-block; background: linear-gradient(135deg, var(--accent), #ff5d73); color: #fff; text-decoration: none;
+         padding: 14px 32px; border-radius: 999px; font-weight: 700; box-shadow: 0 0 0 0 rgba(255,159,28,.6); animation: pulse 2s infinite; }
+  @keyframes pulse { 70% { box-shadow: 0 0 0 18px rgba(255,159,28,0); } 100% { box-shadow: 0 0 0 0 rgba(255,159,28,0); } }
+
+  h2 { text-align: center; font-size: 1.8rem; margin: 10px 0 24px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 18px; max-width: 1000px; margin: 0 auto; padding: 0 18px 60px; }
+  .card { background: var(--glass); border: 1px solid var(--glass-line); border-radius: 20px; padding: 20px;
+          backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); text-align: center;
+          transition: transform .15s ease-out, box-shadow .3s; transform-style: preserve-3d; }
+  .card:hover { box-shadow: 0 12px 40px rgba(255,159,28,.25); }
+  .icon { font-size: 3.2rem; display: block; animation: floaty 3s ease-in-out infinite; }
+  @keyframes floaty { 50% { transform: translateY(-8px); } }
+  .cover { position: relative; height: 140px; border-radius: 14px; overflow: hidden; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,.25); }
+  .cover img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .card h3 { margin: 10px 0 4px; font-size: 1.15rem; }
+  .card small { color: var(--muted); }
+  .price { color: var(--accent2); font-weight: 800; font-size: 1.3rem; margin: 10px 0; }
+  .add { width: 100%; background: transparent; color: var(--text); border: 1px solid var(--accent); border-radius: 12px; padding: 10px; font-weight: 700; cursor: pointer; transition: background .2s; }
+  .add:hover, .add.done { background: var(--accent); color: #1a1100; }
+
+  .reveal { opacity: 0; transform: translateY(40px); transition: opacity .7s, transform .7s; }
+  .reveal.in { opacity: 1; transform: none; }
+  footer { text-align: center; color: var(--muted); padding: 24px; font-size: .9rem; }
+
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } .reveal { opacity: 1; transform: none; } }
+</style>
+</head>
+<body>
+
+<div class="bg">
+  <div class="bg-image"></div>
+  <svg class="chute" viewBox="0 0 120 160" aria-hidden="true">
+    <path d="M10 60 Q60 -20 110 60 Z" fill="#7a8f4e"/><path d="M35 60 Q60 -5 85 60" fill="none" stroke="#4f5f2f" stroke-width="3"/>
+    <path d="M10 60 L55 120 M110 60 L65 120 M60 60 L60 118" stroke="#ddd" stroke-width="1.5"/>
+    <circle cx="60" cy="124" r="7" fill="#e8c9a0"/><rect x="52" y="131" width="16" height="22" rx="4" fill="#3d4a2a"/>
+  </svg>
+  <svg class="chute c2" viewBox="0 0 120 160" aria-hidden="true">
+    <path d="M10 60 Q60 -20 110 60 Z" fill="#c4572b"/><path d="M10 60 L55 120 M110 60 L65 120 M60 60 L60 118" stroke="#ddd" stroke-width="1.5"/>
+    <circle cx="60" cy="124" r="7" fill="#e8c9a0"/><rect x="52" y="131" width="16" height="22" rx="4" fill="#3d4a2a"/>
+  </svg>
+  <svg class="chute c3" viewBox="0 0 120 160" aria-hidden="true">
+    <path d="M10 60 Q60 -20 110 60 Z" fill="#5b7fa6"/><path d="M10 60 L55 120 M110 60 L65 120 M60 60 L60 118" stroke="#ddd" stroke-width="1.5"/>
+    <circle cx="60" cy="124" r="7" fill="#e8c9a0"/><rect x="52" y="131" width="16" height="22" rx="4" fill="#3d4a2a"/>
+  </svg>
+</div>
+<canvas id="fx"></canvas>
+
+<div class="page">
+  <header>
+    <div class="logo">خالد <span>ستور</span></div>
+    <button class="cart-btn" id="cartBtn">🛒 السلة (<span id="count">0</span>)</button>
+  </header>
+
+  <section class="hero">
+    <h1>خالد ستور</h1>
+    <p>أفضل الألعاب بأفضل الأسعار. اختر لعبتك واطلبها مباشرة عبر واتساب.</p>
+    <a class="cta" href="#games">تصفّح الألعاب</a>
+  </section>
+
+  <section id="games">
+    <h2 class="reveal">الألعاب المتاحة</h2>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <section id="consoles">
+  <h2 class="reveal">وحدات الألعاب</h2>
+  <div class="grid" id="consolesGrid"></div>
+</section>
+
+  <footer>© خالد ستور - جميع الحقوق محفوظة</footer>
+</div>
+
+<script>
+  // عدّل رقمك هنا (بالصيغة الدولية بدون +)
+  const PHONE = "249966141843";
+
+  // عدّل الألعاب والأسعار من هنا
+  const games = [
+    // img = اسم ملف الصورة داخل مجلد images (إذا لم توجد الصورة تظهر الأيقونة)
+    { icon: "🪂", img: "pubg.jpg", name: "ببجي موبايل", note: "شحن شدات UC", price: 5 },
+    { icon: "⚽", img: "fifa.jpg", name: "FIFA", note: "نسخة كاملة", price: 25 },
+    { icon: "🥅", img: "pes.jpg", name: "PES", note: "نسخة كاملة", price: 20 },
+    { icon: "🚗", img: "gta.jpg", name: "GTA V", note: "نسخة كاملة", price: 18 },
+    { icon: "🔫", img: "cod.jpg", name: "Call of Duty", note: "نسخة كاملة", price: 30 },
+    { icon: "🏰", img: "coc.jpg", name: "Clash of Clans", note: "حسابات وجواهر", price: 10 },
+    { icon: "⛏️", img: "minecraft.jpg", name: "Minecraft", note: "نسخة كاملة", price: 15 }
+  ];
+
+  const consoles = [
+    { icon: "🎮", img: "ps5.jpg", name: "PlayStation 5", note: "نسخة قياسية", price: 499 },
+    { icon: "🎮", img: "xbox.jpg", name: "Xbox Series X", note: "نسخة قياسية", price: 499 },
+    { icon: "🎮", img: "switch.jpg", name: "Nintendo Switch", note: "نسخة قياسية", price: 299 }
+  ];
+  const cart = [];
+  const grid = document.getElementById("grid");
+  const countEl = document.getElementById("count");
+  const cartBtn = document.getElementById("cartBtn");
+
+  [...games, ...consoles].forEach(g => {
+    const el = document.createElement("div");
+    el.className = "card reveal";
+    el.innerHTML =
+      '<div class="cover"><span class="icon">' + g.icon + '</span><img src="images/' + g.img + '" alt="' + g.name + '" onerror="this.remove()"></div><h3>' + g.name + '</h3><small>' + g.note + '</small>' +
+      '<div class="price">$' + g.price + '</div><button class="add">أضف للسلة</button>';
+    const btn = el.querySelector(".add");
+    btn.addEventListener("click", () => {
+      cart.push(g);
+      countEl.textContent = cart.length;
+      cartBtn.classList.remove("bump"); void cartBtn.offsetWidth; cartBtn.classList.add("bump");
+      btn.classList.add("done"); btn.textContent = "تمت الإضافة ✓";
+      setTimeout(() => { btn.classList.remove("done"); btn.textContent = "أضف للسلة"; }, 1200);
+    });
+    // إمالة ثلاثية الأبعاد عند تحريك المؤشر
+    el.addEventListener("pointermove", e => {
+      const r = el.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width - 0.5;
+      const y = (e.clientY - r.top) / r.height - 0.5;
+      el.style.transform = "perspective(700px) rotateY(" + x * 14 + "deg) rotateX(" + -y * 14 + "deg)";
+    });
+    el.addEventListener("pointerleave", () => { el.style.transform = ""; });
+    (consoles.includes(g) ? document.getElementById("consolesGrid") : grid).appendChild(el);
+  });
+
+  // إرسال الطلب إلى واتساب
+  cartBtn.addEventListener("click", () => {
+    if (!cart.length) { alert("السلة فارغة، أضف لعبة أولاً."); return; }
+    const total = cart.reduce((s, g) => s + g.price, 0);
+    const lines = cart.map(g => "- " + g.name + " ($" + g.price + ")").join("\n");
+    const msg = "مرحباً خالد ستور، أريد طلب:\n" + lines + "\nالمجموع: $" + total;
+    window.open("https://wa.me/" + PHONE + "?text=" + encodeURIComponent(msg), "_blank");
+  });
+
+  // ظهور العناصر عند التمرير
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }), { threshold: .15 });
+  document.querySelectorAll(".reveal").forEach((el, i) => { el.style.transitionDelay = (i % 3) * 0.1 + "s"; io.observe(el); });
+
+  // شرارات تتصاعد في الخلفية
+  const c = document.getElementById("fx"), ctx = c.getContext("2d");
+  let W, H;
+  function size() { W = c.width = innerWidth; H = c.height = innerHeight; }
+  addEventListener("resize", size); size();
+  const sparks = Array.from({ length: 60 }, () => ({ x: Math.random() * W, y: Math.random() * H, r: Math.random() * 2 + .5, v: Math.random() * .8 + .3 }));
+  (function loop() {
+    ctx.clearRect(0, 0, W, H);
+    for (const s of sparks) {
+      s.y -= s.v; s.x += Math.sin(s.y / 40) * .4;
+      if (s.y < -5) { s.y = H + 5; s.x = Math.random() * W; }
+      ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, 7);
+      ctx.fillStyle = "rgba(255,170,60,.8)"; ctx.fill();
+    }
+    requestAnimationFrame(loop);
+  })();
+</script>
+</body>
+</html>
